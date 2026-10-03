@@ -87,12 +87,12 @@ jobs:
 
           sed -i '/^CONFIG_FIRMWARE_INCLUDE_WIREGUARD=/d' .config
           echo 'CONFIG_FIRMWARE_INCLUDE_WIREGUARD=n' >> .config
-
+          
       - name: Build firmware
         run: |
           cd trunk
           sudo ./clear_tree
-          fakeroot ./build_firmware_modify HC5861B
+          fakeroot ./build_firmware_modify HC5861B 0
 
       - name: Verify build configuration
         run: |
