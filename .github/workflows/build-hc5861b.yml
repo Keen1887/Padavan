@@ -6,3 +6,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Test HC5861B config
+        run: |
+           test -f trunk/configs/templates/HC5861B.config
+           echo "HC5861B.config found"
