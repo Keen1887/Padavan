@@ -10,7 +10,29 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Test HC5861B config
+      - name: Install dependencies
         run: |
-           test -f trunk/configs/templates/HC5861B.config
-           echo "HC5861B.config found"
+           sudo apt-get update
+           sudo apt-get install -y unzip libtool-bin curl cmake gperf gawk flex bison nano xxd fakeroot kmod cpio git python3-docutils gettext automake autopoint texinfo build-essential help2man pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget libc-dev-bin libcunit1-dev libhdf5-dev libopenblas-dev
+
+      - name: Download toolchain
+        run: |
+           cd toolchain-mipsel
+           sh dl_toolchain.sh
+
+      - name: Prepare HC5861B config
+        run: |
+            cd trunk
+            cp -f configs/templates/HC5861B.config .config
+
+      - name: Build HC5861B
+        run: |
+          cd trunk
+          sudo ./clear_tree
+             fakeroot ./build_firmware_modify HC5861B
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+            name: HC5861B-test
+            path: trunk/images/*.trx
