@@ -94,6 +94,19 @@ jobs:
           sudo ./clear_tree
           fakeroot ./build_firmware_modify HC5861B
 
+      - name: Verify build configuration
+        run: |
+          echo "===== SSR CONFIG ====="
+          grep -n "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS" trunk/.config || true
+          echo "===== IPV6 CONFIG ====="
+          grep -n "CONFIG_FIRMWARE_ENABLE_IPV6" trunk/.config || true
+          echo "===== SSR FILES ====="
+          find trunk -type f \( -name "ss-redir" -o -name "ss-local" -o -name "ss-server" \) -print
+          echo "===== SHADOWSOCKS REFERENCES ====="
+          grep -Ril "SHADOWSOCKS" trunk/user 2>/dev/null | head -30 || true
+          echo "===== FIRMWARE ====="
+          ls -lh trunk/images/*.trx
+
       - name: Upload firmware
         uses: actions/upload-artifact@v4
         with:
