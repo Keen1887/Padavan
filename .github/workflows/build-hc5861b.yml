@@ -1,106 +1,99 @@
 name: Build HC5861B SSR
 
-"on":
-workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
-build:
-runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext unzip libssl-dev xsltproc wget curl fakeroot python3 python3-pip
 
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+      - name: Download toolchain
+        run: sh dl_toolchain.sh
 
-  - name: Install dependencies
-    run: |
-      sudo apt-get update
-      sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext unzip libssl-dev xsltproc wget curl fakeroot python3 python3-pip
+      - name: Prepare HC5861B config
+        run: |
+          cd trunk
+          cp -f configs/templates/HC5861B.config .config
 
-  - name: Download toolchain
-    run: |
-      sh dl_toolchain.sh
+          sed -i '/^CONFIG_FIRMWARE_ENABLE_IPV6=/d' .config
+          echo 'CONFIG_FIRMWARE_ENABLE_IPV6=n' >> .config
 
-  - name: Prepare HC5861B config
-    run: |
-      cd trunk
-      cp -f configs/templates/HC5861B.config .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=y' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_ENABLE_IPV6=/d' .config
-      echo 'CONFIG_FIRMWARE_ENABLE_IPV6=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_SMBD36=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_SMBD36=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=y' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_SMBD36=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_SMBD36=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_SFTP=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_SFTP=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_EAP_PEAP=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_OPENVPN=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_OPENVPN=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_SFTP=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_SFTP=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_XUPNPD=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_XUPNPD=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_OPENVPN=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_OPENVPN=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_FFMPEG_NEW=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_FFMPEG_NEW=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_XUPNPD=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_XUPNPD=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_FFMPEG_NEW=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_FFMPEG_NEW=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_DOGCOM=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_DOGCOM=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_SCUTCLIENT=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_MINIEAP=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_MINIEAP=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_DOGCOM=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_DOGCOM=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_MINIEAP=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_MINIEAP=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_NAPT66=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_NAPT66=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_NJIT_CLIENT=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_VLMCSD=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_VLMCSD=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_NAPT66=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_NAPT66=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_TTYD=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_TTYD=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_VLMCSD=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_VLMCSD=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_LRZSZ=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_LRZSZ=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_TTYD=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_TTYD=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_SRELAY=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_SRELAY=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_LRZSZ=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_LRZSZ=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_MENTOHUST=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_MENTOHUST=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_SRELAY=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_SRELAY=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_FRPC=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_FRPC=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_MENTOHUST=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_MENTOHUST=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_FRPS=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_FRPS=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_FRPC=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_FRPC=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_TUNSAFE=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_TUNSAFE=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_FRPS=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_FRPS=n' >> .config
+          sed -i '/^CONFIG_FIRMWARE_INCLUDE_WIREGUARD=/d' .config
+          echo 'CONFIG_FIRMWARE_INCLUDE_WIREGUARD=n' >> .config
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_TUNSAFE=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_TUNSAFE=n' >> .config
+      - name: Build firmware
+        run: |
+          cd trunk
+          sudo ./clear_tree
+          fakeroot ./build_firmware_modify HC5861B
 
-      sed -i '/^CONFIG_FIRMWARE_INCLUDE_WIREGUARD=/d' .config
-      echo 'CONFIG_FIRMWARE_INCLUDE_WIREGUARD=n' >> .config
-
-  - name: Build firmware
-    run: |
-      cd trunk
-      sudo ./clear_tree
-      fakeroot ./build_firmware_modify HC5861B
-
-  - name: Upload firmware
-    uses: actions/upload-artifact@v4
-    with:
-      name: HC5861B-SSR
-      path: trunk/images/*.trx
-
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: HC5861B-SSR
+          path: trunk/images/*.trx
