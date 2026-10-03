@@ -94,18 +94,43 @@ jobs:
           sudo ./clear_tree
           fakeroot ./build_firmware_modify HC5861B 0
 
-      - name: Verify build configuration
+      - name: Final firmware verification
         run: |
-          echo "===== SSR CONFIG ====="
-          grep -n "CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS" trunk/.config || true
-          echo "===== IPV6 CONFIG ====="
-          grep -n "CONFIG_FIRMWARE_ENABLE_IPV6" trunk/.config || true
-          echo "===== SSR FILES ====="
-          find trunk -type f \( -name "ss-redir" -o -name "ss-local" -o -name "ss-server" \) -print
-          echo "===== SHADOWSOCKS REFERENCES ====="
-          grep -Ril "SHADOWSOCKS" trunk/user 2>/dev/null | head -30 || true
-          echo "===== FIRMWARE ====="
+          echo "========== 1. FIRMWARE CONFIG =========="
+          grep -n '^CONFIG_FIRMWARE_PRODUCT_ID=' trunk/.config || true
+          grep -n '^CONFIG_VENDOR=' trunk/.config || true
+          grep -n '^CONFIG_PRODUCT=' trunk/.config || true
+          grep -n '^CONFIG_FIRMWARE_ENABLE_IPV6=' trunk/.config || true
+          grep -n '^CONFIG_FIRMWARE_INCLUDE_SHADOWSOCKS=' trunk/.config || true
+
+          echo "========== 2. SSR BINARIES =========="
+          test -f trunk/romfs/usr/bin/ss-local && echo "OK: ss-local"
+          test -f trunk/romfs/usr/bin/ss-redir && echo "OK: ss-redir"
+
+          echo "========== 3. SSR WEBUI =========="
+          find trunk/romfs -type f \( \
+            -name 'Shadowsocks.asp' \
+            -o -name 'Shadowsocks_action.asp' \
+            -o -name 'Shadowsocks_log.asp' \
+          \) -print
+
+          echo "========== 4. SSR RUNTIME REFERENCES =========="
+          grep -Ril 'SHADOWSOCKS\|ss-redir\|ss-local' trunk/romfs 2>/dev/null | head -100 || true
+
+          echo "========== 5. MODEL =========="
+          grep -Ril 'HC5861B' trunk/configs/boards 2>/dev/null | head -20 || true
+
+          echo "========== 6. FIRMWARE =========="
           ls -lh trunk/images/*.trx
+          stat -c 'SIZE_BYTES=%s' trunk/images/*.trx
+
+          echo "========== 7. FILESYSTEM =========="
+          find trunk/romfs/usr/bin -maxdepth 1 -type f \( \
+            -name 'ss-local' \
+            -o -name 'ss-redir' \
+          \) -exec ls -lh {} \;
+
+          echo "========== VERIFICATION COMPLETE =========="
 
       - name: Upload firmware
         uses: actions/upload-artifact@v4
